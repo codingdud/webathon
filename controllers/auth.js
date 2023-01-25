@@ -1,6 +1,6 @@
 const mysql = require("mysql");
 const jwt = require("jsonwebtoken");
-const bcrypt = require('bcryptjs');
+const bcrypt = require("bcrypt");
 
 const db = mysql.createConnection({
     host: process.env.host,
@@ -24,6 +24,7 @@ exports.register = (req, res)=>{
             console.log(error);
         }
         if(results.length > 0){
+           // console.log(results[0].email);
             return res.render('register',{
                 message: 'this email is already in use'
             })
@@ -32,13 +33,13 @@ exports.register = (req, res)=>{
                 message: 'password is not same!'
             });
         }
-        let hashedPasswd = await bcrypt.hash(pass,2);
+        const hashedPasswd =await bcrypt.hash(pass, 10);
         console.log(hashedPasswd);
         db.query('INSERT INTO temp SET ?',{user:user,passwd:hashedPasswd,email:mail},(error,results)=>{
             if(error){
-                console.log(error);
+                console.log(error); 
             } else {
-                res.render('register',{
+                return res.render('register',{
                     message: "User registered"
                 });
             }
@@ -57,31 +58,31 @@ exports.login = (req,res)  =>{
     const passcon = req.body.passcon; */
 
     const {user, pass} = req.body;
+    
 
-    db.query('SELECT pass FROM temp WHERE name = ?',[user], async (error, results) => {
+    db.query('SELECT passwd FROM temp WHERE user = ?',[user], async (error, results) => {
         if(error){
-            console.log(error);
-        }
-        if(results.length > 0){
-            return res.render('login',{
-                message: 'this name is already in use'
-            })
-        } else if (pass) {
-            return res.render('login',{
-                message: 'password is not same!'
+            
+           console.log(error);
+        }else if(results.length>0){
+               await bcrypt.compare(pass,results[0].passwd, (err, result)=> {
+                if (err) { throw (err); }
+                else if(result){
+                    res.send("login sucessful!");
+                    /* return res.render('login',{
+                        message: "login sucessfull"
+                    }); */
+                }
+                else{
+                    res.send("password worng");
+                    console.log("worng password!");
+                }
+                console.log(result);
             });
+        }else{
+            res.send("no user exist!");
+            console.log("no user exist!");
         }
-        let hashedPasswd = await bcrypt.hash(pass,2);
-        console.log(hashedPasswd);
-        db.query('INSERT INTO temp SET ?',{user:user,passwd:hashedPasswd,email:mail},(error,results)=>{
-            if(error){
-                console.log(error);
-            } else {
-                res.render('login',{
-                    message: "User registered"
-                });
-            }
-        });
-        //res.send("testing..");
+        
     });
 }
