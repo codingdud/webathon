@@ -1,7 +1,7 @@
 nav {
     background-color: blueviolet;
     color: azure;
-    padding: 30px 60px;
+    padding: 1% 2%;
     display: flex;
     justify-content: space-between ;
 }
