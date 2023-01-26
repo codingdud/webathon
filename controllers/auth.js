@@ -1,6 +1,11 @@
 const mysql = require("mysql");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const express = require("express");
+
+const app = express();
+
+app.use(express.json());
 
 const db = mysql.createConnection({
     host: process.env.host,
@@ -68,7 +73,10 @@ exports.login = (req,res)  =>{
                await bcrypt.compare(pass,results[0].passwd, (err, result)=> {
                 if (err) { throw (err); }
                 else if(result){
-                    res.send("login sucessful!");
+                    //res.send("login sucessful!");
+                    const juser={name:user}
+                    const token = jwt.sign(juser,process.env.access_token_secret,{expiresIn:'15s'});
+                    res.json({token:token});
                     /* return res.render('login',{
                         message: "login sucessfull"
                     }); */
