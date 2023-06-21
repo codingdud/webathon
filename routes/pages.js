@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
+const { authenticateJWT }= require("../controllers/auth");
 
-router.get('/',(req,res)=>{
+router.get('/',authenticateJWT,(req,res)=>{
+    console.log("pages:  "+req.cookies);
     res.render('index');
 });
 router.get('/register',(req,res)=>{
