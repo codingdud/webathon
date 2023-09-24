@@ -22,11 +22,11 @@ RUN cross-env NODE_ENV=production PORT=5001
 
 EXPOSE 5001
 
- CMD [ "npm", "start" ]
+ #CMD [ "npm", "start" ]
 
 
 #RUN pm2 start app.js
 
 
 #CMD ["pm2-runtime", "app.js", "-i", "3" ]
-#CMD ["supervisor","app.js"]
+CMD ["supervisor","app.js"]
