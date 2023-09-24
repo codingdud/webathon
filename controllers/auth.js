@@ -10,10 +10,10 @@ app.use(express.json());
 app.use(cookieParser());
 
 const db = mysql.createConnection({
-    host: process.env.host,
-    user: process.env.user,
-    password: process.env.password,
-    database: process.env.database
+    host: process.env.HOST,
+    user: process.env.USER,
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE
 }); 
 
 exports.register = (req, res)=>{
@@ -79,8 +79,8 @@ exports.login = (req,res)  =>{
                 else if(result){
                     //res.send("login sucessful!");
                     const juser={name:user}
-                    const token = jwt.sign(juser,process.env.access_token_secret,{expiresIn:'6s'});
-                    const rtoken = jwt.sign(juser,process.env.refres_token_secret);
+                    const token = jwt.sign(juser,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'6s'});
+                    const rtoken = jwt.sign(juser,process.env.REFRESH_TOKEN_SECRET);
                     refreshtoken.push(rtoken);
 
                     //cookie
@@ -119,17 +119,17 @@ exports.authenticateJWT = (req, res, next) => {
     const rtoken= req.cookies.rtoken;
   
     if (token) {
-      jwt.verify(token,process.env.access_token_secret, (err, user) => {
+      jwt.verify(token,process.env.ACCESS_TOKEN_SECRET, (err, user) => {
         if (err) {
             if(refreshtoken.includes(rtoken)){
-                jwt.verify(rtoken,process.env.refres_token_secret,(err,user)=>{
+                jwt.verify(rtoken,process.env.REFRESH_TOKEN_SECRET,(err,user)=>{
                     if(err){
                         res.redirect("/login");
                     }
                     else{
                         const juser={name:user.name}
                         console.log("rrrrr",user);
-                        const token = jwt.sign(juser,process.env.access_token_secret,{expiresIn:'6s'});
+                        const token = jwt.sign(juser,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'6s'});
                         const options={
                             expires:new Date(Date.now()+1*24*60*60*1000),
                             httpOnly:true
